@@ -19,8 +19,8 @@ public class JDBCPlayerDAO implements PlayerDAO {
 
 	private JdbcTemplate jdbcTemplate;
 
-	public JDBCPlayerDAO(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
+	public JDBCPlayerDAO(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
 	public List<Player> getAllPlayers(){
@@ -69,7 +69,7 @@ public class JDBCPlayerDAO implements PlayerDAO {
 	
 	public List<Player> getAvailablePlayersAtPosition(String position){
 		List<Player> availableByPosition = new ArrayList<Player>();
-		String sqlGetPlayers = "SELECT playerId, firstName, lastName, position FROM player WHERE position = ? AND ownerId IS NULL";
+		String sqlGetPlayers = "SELECT playerId, firstName, lastName, position FROM player WHERE position = ? AND ownerId IS NULL ORDER BY lastName;";
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlGetPlayers, position);
 		while(results.next()) {
 			Player p = new Player();

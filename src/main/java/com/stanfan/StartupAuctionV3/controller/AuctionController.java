@@ -2,12 +2,11 @@ package com.stanfan.StartupAuctionV3.controller;
 
 import java.util.List;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stanfan.StartupAuctionV3.model.Bid;
@@ -31,14 +30,22 @@ public class AuctionController {
 		this.bidDAO = bidDAO;
 	}
 	
+	//@Autowired
+	//InventoryManager inventory = new InventoryManager();
+
+
+	
+	
+	
 	@RequestMapping(path = "/api/team/{ownerId}", method = RequestMethod.GET)
 	public List<Player> getTeam(@PathVariable int ownerId) {
 		List<Player> onTeam = playerDAO.getAllPlayersOnTeam(ownerId);
 		return onTeam;
 	}
 	//add bid to bid list
+	@CrossOrigin(origins = "http://localhost:8081")
 	@RequestMapping(path = "/api/bid", method = RequestMethod.POST)
-	public void addBid(Bid bid) {
+	public void addBid(@RequestBody Bid bid) {
 		bidDAO.addBid(bid);
 	}
 	//add owner to player when lot is won
@@ -55,7 +62,7 @@ public class AuctionController {
 		return auctionPlayer;
 	}
 	// get list of unowned players based off position
-
+	@CrossOrigin(origins = "http://localhost:8081")
 	@RequestMapping(path = "/api/players/{position}", method = RequestMethod.GET)
 	public List<Player> getAvailablePlayersByPosition(@PathVariable String position){
 		
