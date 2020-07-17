@@ -14,4 +14,5 @@ public interface PlayerDAO {
 	public void addOwnerToPlayer(int playerId, int ownerId);
 	public List<Player> getAvailablePlayersAtPosition(String position);
 	public List<Player> getAllPlayers();
+	public Player getPlayerById(int id);
 }

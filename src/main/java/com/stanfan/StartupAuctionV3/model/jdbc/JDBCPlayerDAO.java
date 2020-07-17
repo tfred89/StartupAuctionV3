@@ -37,6 +37,16 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		}
 		return allPlayers;
 	}
+	public Player getPlayerById(int id) {
+		Player p = new Player();
+		String getPlayer = "SELECT * FROM player WHERE playerid = ?";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(getPlayer, id);
+		while(result.next()) {
+		p = mapRowToPlayer(result);
+		}
+		return p;
+	}
+	
 	
 	public Player insertPlayer(Player insertMe) {
 		String sqlInsertPlayer = "INSERT INTO player (playerId, espnId, firstName, lastName, position) " +

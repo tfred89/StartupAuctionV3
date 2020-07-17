@@ -1,17 +1,15 @@
 package com.stanfan.StartupAuctionV3.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.stanfan.StartupAuctionV3.model.EspnPlayer;
@@ -26,7 +24,7 @@ public class InventoryManager {
 	private final String url = "http://fantasy.espn.com/apis/v3/games/ffl/seasons/2020/players?scoringPeriodId=0&view=players_wl";
 	private PlayerDAO playerDAO;
 	RestTemplate restTemplate = new RestTemplate();
-	
+	Map<Integer, String> posMap = new HashMap<Integer, String>();
 	
 	public InventoryManager(DataSource dataSource){
 		playerDAO = new JDBCPlayerDAO(dataSource);
@@ -55,6 +53,12 @@ public class InventoryManager {
 	
 	public List<Player> makePlayerInventory(EspnPlayer[] espnPlayers) {
 		List<Player> ourPlayers = new ArrayList<Player>();
+		
+		posMap.put(1, "QB");
+		posMap.put(2, "RB");
+		posMap.put(3, "WR");
+		posMap.put(4, "TE");
+		
 		for (EspnPlayer player : espnPlayers) {
 			if (player.getDefaultPositionId() < 5) {
 				String firstName = player.getFirstName();
@@ -75,21 +79,7 @@ public class InventoryManager {
 	}
 
 	public String posToString(int posId) {
-		if (posId == 1) {
-			return "QB";
-		}
-		if (posId == 2) {
-			return "RB";
-		}
-		if (posId == 3) {
-			return "WR";
-		}
-		if (posId == 4) {
-			return "TE";
-		} else {
-			return "NA";
-		}
-
+		return posMap.get(posId);
 	}
 	
 }

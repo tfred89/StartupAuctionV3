@@ -5,6 +5,6 @@ import org.springframework.stereotype.Component;
 @Component
 public interface BidDAO {
 	
-	public void addBid(Bid legalBid);
-
+	public Bid addBid(Bid legalBid);
+	public Bid getBidById(int bidId);
 }
