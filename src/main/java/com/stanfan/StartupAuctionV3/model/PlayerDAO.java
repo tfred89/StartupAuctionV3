@@ -15,4 +15,5 @@ public interface PlayerDAO {
 	public List<Player> getAvailablePlayersAtPosition(String position);
 	public List<Player> getAllPlayers();
 	public Player getPlayerById(int id);
+	public void addInfoAfterWin(Bid bid);
 }

@@ -30,10 +30,11 @@ public class JDBCLotDAO implements LotDAO {
 	
 	@Override
 	public void clearLot(int lotId) {
-		String sqlClearBid = "UPDATE lot SET bidid = NULL WHERE lotId = ?";
+		String sqlClearBid = "UPDATE lot SET bidid = NULL, passes = 0 WHERE lotId = ?";
 		jdbcTemplate.update(sqlClearBid, lotId);
-		
 	}
+	
+	
 	
 	
 	@Override

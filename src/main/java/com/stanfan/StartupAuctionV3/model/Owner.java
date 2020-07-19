@@ -8,13 +8,12 @@ public class Owner {
 	private int capRoom;
 	
 	
-	public Owner(int ownerId, String ownerName) {
-		this.ownerId = ownerId;
-		this.ownerName = ownerName;
+	public Owner() {
 		this.yearsLeft = 80;
 		this.capRoom = 500;
-		
 	}
+	
+	
 	public int getOwnerId() {
 		return ownerId;
 	}

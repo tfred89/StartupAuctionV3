@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
+import com.stanfan.StartupAuctionV3.model.Bid;
 import com.stanfan.StartupAuctionV3.model.Player;
 import com.stanfan.StartupAuctionV3.model.PlayerDAO;
 
@@ -22,7 +23,7 @@ public class JDBCPlayerDAO implements PlayerDAO {
 	public JDBCPlayerDAO(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-	
+	@Override
 	public List<Player> getAllPlayers(){
 		List<Player> allPlayers = new ArrayList<Player>();
 		String sqlGetPlayers = "SELECT playerId, firstName, lastName, position FROM player ";
@@ -37,6 +38,7 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		}
 		return allPlayers;
 	}
+	@Override
 	public Player getPlayerById(int id) {
 		Player p = new Player();
 		String getPlayer = "SELECT * FROM player WHERE playerid = ?";
@@ -47,7 +49,7 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		return p;
 	}
 	
-	
+	@Override
 	public Player insertPlayer(Player insertMe) {
 		String sqlInsertPlayer = "INSERT INTO player (playerId, espnId, firstName, lastName, position) " +
 								 "VALUES (?, ?, ?, ?, ?)";
@@ -55,11 +57,13 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		jdbcTemplate.update(sqlInsertPlayer, insertMe.getPlayerId(), insertMe.getEspnId(), insertMe.getFirstName(), insertMe.getLastName(), insertMe.getPosition());
 		return insertMe;
 	}
+	
 	public boolean playerAlreadyListed(int id) {
 		String sqlCheckForPlayer = "SELECT espnId FROM player WHERE espnId = ?";
 		int count = jdbcTemplate.queryForObject(sqlCheckForPlayer, new Object[] {id}, Integer.class);
 		return count > 0;
 	}
+	@Override
 	public List<Player> getAllPlayersOnTeam(int ownerId){
 		List<Player> playersOnTeam = new ArrayList<Player>();
 		String sqlPlayersOnTeam = "SELECT playerId, espnId, ownerId, firstname, lastname, position, salary, length, contractvalue " +
@@ -72,11 +76,22 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		}
 		return playersOnTeam;
 	}
+	@Override
 	public void addOwnerToPlayer(int playerId, int ownerId) {
 		String sqlSetOwner = "UPDATE player SET ownerId = ? WHERE playerId = ?";
 		jdbcTemplate.update(sqlSetOwner, ownerId, playerId);
 	}
-	
+	@Override
+	public void addInfoAfterWin(Bid bid) {
+		int newSalary = bid.getBidSalary();
+		int newLength = bid.getBidLength();
+		int contractValue = (newLength * 5) + newSalary;
+		int playerId = bid.getPlayerId();
+		int ownerId = bid.getBidderId();
+		String sqlPlayerUpdate = "UPDATE player SET ownerId = ?, salary = ?, length = ?, contractvalue = ? WHERE playerid = ?";
+		jdbcTemplate.update(sqlPlayerUpdate, ownerId, newSalary, newLength, contractValue, playerId);
+	}
+	@Override
 	public List<Player> getAvailablePlayersAtPosition(String position){
 		List<Player> availableByPosition = new ArrayList<Player>();
 		String sqlGetPlayers = "SELECT playerId, firstName, lastName, position FROM player WHERE position = ? AND ownerId IS NULL ORDER BY lastName;";

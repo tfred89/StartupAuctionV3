@@ -21,7 +21,7 @@ import com.stanfan.StartupAuctionV3.model.Player;
 import com.stanfan.StartupAuctionV3.model.PlayerDAO;
 
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
 @RestController
 public class AuctionController {
 	private PlayerDAO playerDAO;
@@ -62,7 +62,7 @@ public class AuctionController {
 	}
 	
 	//add owner to player when lot is won
-	@RequestMapping(path = "/api/win/{playerid}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/api/win/player/", method = RequestMethod.PUT)
 	public void winAuction(@RequestBody @PathVariable int playerid, Owner winningOwner) {
 		playerDAO.addOwnerToPlayer(playerid, winningOwner.getOwnerId());
 	}
@@ -72,16 +72,29 @@ public class AuctionController {
 	public void tempOwnerForNomination(@RequestBody Player player) {
 		playerDAO.addOwnerToPlayer(player.getPlayerId(), player.getOwnerId());
 	}
-	
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@RequestMapping(path = "/api/win/player", method = RequestMethod.PUT)
+	public void updatePlayerAfterWin(@RequestBody Bid bid) {
+		System.out.println("test! well.. we got this far...");
+		playerDAO.addInfoAfterWin(bid);
+	}
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@RequestMapping(path = "/api/win/owner", method = RequestMethod.PUT)
+	public void updateOwnerAfterWin(@RequestBody Bid bid) {
+		ownerDAO.updateInfoAfterWin(bid);
+		//return ownerDAO.getOwnerInfoById(bid.getBidderId());
+	}
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
 	@RequestMapping(path = "/api/auction/{playerid}", method = RequestMethod.GET)
 	public Player getPlayerAuctionInfo(@PathVariable int playerid) {
 		Player auctionPlayer = new Player();
-		
-		
 		return auctionPlayer;
 	}
 	// get list of unowned players based off position
 	//@CrossOrigin(origins = "http://localhost:8081")
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
 	@RequestMapping(path = "/api/position/{position}", method = RequestMethod.GET)
 	public List<Player> getAvailablePlayersByPosition(@PathVariable String position){
 		
@@ -89,17 +102,25 @@ public class AuctionController {
 	}
 	
 
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
 	@RequestMapping(value = "/api/players", method = RequestMethod.GET)
 	public List<Player> getAllPlayers(){
 		System.out.println("this worked.");
 		return playerDAO.getAllPlayers();
 	}
 
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
 	@RequestMapping(value = "/api/lot/{lotId}", method = RequestMethod.GET)
 	public Bid getBidInfoForLotDisplay(@PathVariable int lotId) {
 		Bid b = new Bid();
 		b = lotDAO.getBidByLotId(lotId);
 		return b;
+	}
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@RequestMapping(value = "/api/lot/clear/{lotId}", method = RequestMethod.PUT)
+	public void clearThisLot(@PathVariable int lotId) {
+		lotDAO.clearLot(lotId);
 	}
 	
 	@CrossOrigin(origins = "http://localhost:8081")
@@ -112,6 +133,18 @@ public class AuctionController {
 		System.out.println(l.getLotId());
 		System.out.println(l.getBidId());
 		lotDAO.lotBid(l);
+	}
+	
+	@RequestMapping(path = "api/owner/{ownerId}", method = RequestMethod.GET)
+	public Owner getOwnerById(@PathVariable int ownerId){
+		Owner o = new Owner();
+		o = ownerDAO.getOwnerInfoById(ownerId);
+		return o;
+	}
+	
+	@RequestMapping(path = "api/owner/scoreboard", method = RequestMethod.GET)
+	public List<Owner> getOwnersForTable(){
+		return ownerDAO.getAllOwners();
 	}
 	
 }
