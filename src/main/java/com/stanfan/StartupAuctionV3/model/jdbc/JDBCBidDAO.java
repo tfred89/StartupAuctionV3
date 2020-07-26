@@ -35,14 +35,25 @@ public class JDBCBidDAO implements BidDAO{
 	@Override
 	public Bid addBid(Bid newBid) {
 		
-		String sqlAddBid = "INSERT INTO bidLedger (bidId, playerId, ownerId, bidLength, bidSalary, expires)" +
+		String sqlAddBid = "INSERT INTO bidLedger (bidId, playerId, ownername, bidLength, bidSalary, expires)" +
 							"VALUES (?, ?, ?, ?, ?, ?)";
 		newBid.setBidId(getNextBidId());
-		jdbcTemplate.update(sqlAddBid, newBid.getBidId(), newBid.getPlayerId(), newBid.getBidderId(), 
+		jdbcTemplate.update(sqlAddBid, newBid.getBidId(), newBid.getPlayerId(), newBid.getBidder(), 
 				newBid.getBidLength(), newBid.getBidSalary(), newBid.getExpires());		
 		return newBid;
 	}
-
+	@Override
+	public Bid getHighestBid(int playerId) {
+		Bid newBid = new Bid();
+		String sql = "SELECT bidid, bidlength, bidsalary, playerId, ownername, expires "
+				+ "FROM bidledger WHERE playerId = ? ORDER BY bidid DESC LIMIT 1";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(sql, playerId);
+		while (result.next()) {
+			newBid = mapRowToBid(result);
+		}
+		return newBid;
+	}
+	
 	private int getNextBidId() {
 		SqlRowSet nextId = jdbcTemplate.queryForRowSet("SELECT nextval('bidledger_bidid_seq')");
 		if(nextId.next()) {
@@ -52,13 +63,14 @@ public class JDBCBidDAO implements BidDAO{
 		}
 	}
 	
+	
 	public Bid mapRowToBid(SqlRowSet rs) {
 		Bid p = new Bid();
 		p.setBidId(rs.getInt("bidid"));
 		p.setBidLength(rs.getInt("bidLength"));
 		p.setBidSalary(rs.getInt("bidSalary"));
 		p.setPlayerId(rs.getInt("playerId"));
-		p.setBidderId(rs.getInt("ownerid"));
+		p.setBidder(rs.getString("ownername"));
 		p.setExpires(rs.getString("expires"));
 		return p;
 		

@@ -2,7 +2,14 @@ package com.stanfan.StartupAuctionV3.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,30 +18,74 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.stanfan.StartupAuctionV3.model.Bid;
 import com.stanfan.StartupAuctionV3.model.BidDAO;
+import com.stanfan.StartupAuctionV3.model.IllegalBidException;
+import com.stanfan.StartupAuctionV3.model.LoginDTO;
 import com.stanfan.StartupAuctionV3.model.Lot;
 import com.stanfan.StartupAuctionV3.model.LotDAO;
 import com.stanfan.StartupAuctionV3.model.Owner;
 import com.stanfan.StartupAuctionV3.model.OwnerDAO;
 import com.stanfan.StartupAuctionV3.model.Player;
 import com.stanfan.StartupAuctionV3.model.PlayerDAO;
+import com.stanfan.StartupAuctionV3.model.RegisterUserDTO;
+import com.stanfan.StartupAuctionV3.model.UserAlreadyExistsException;
+import com.stanfan.StartupAuctionV3.security.jwt.JWTFilter;
+import com.stanfan.StartupAuctionV3.security.jwt.TokenProvider;
+
+
+
 
 
 @CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
 @RestController
 public class AuctionController {
+    private final TokenProvider tokenProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private PlayerDAO playerDAO;
 	private OwnerDAO ownerDAO;
 	private BidDAO bidDAO;
 	private LotDAO lotDAO;
 	
-	public AuctionController(PlayerDAO playerDAO, OwnerDAO ownerDAO, BidDAO bidDAO, LotDAO lotDAO) {
-		this.playerDAO = playerDAO;
+	public AuctionController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, 
+			PlayerDAO playerDAO, OwnerDAO ownerDAO, BidDAO bidDAO, LotDAO lotDAO) {
+		
+        this.tokenProvider = tokenProvider;
+        this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.playerDAO = playerDAO;
 		this.ownerDAO = ownerDAO;
 		this.bidDAO = bidDAO;
 		this.lotDAO = lotDAO;
 	}
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
+    @RequestMapping(value = "/api/login", method = RequestMethod.POST)
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginDTO loginDto) {
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = tokenProvider.createToken(authentication, false);
+        
+        Owner user = ownerDAO.findByUsername(loginDto.getUsername());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        return new ResponseEntity<>(new LoginResponse(jwt, user), httpHeaders, HttpStatus.OK);
+    }
+	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequestMapping(value = "/api/register", method = RequestMethod.POST)
+    public void register(@RequestBody RegisterUserDTO newUser) {
+        try {
+            Owner user = ownerDAO.findByUsername(newUser.getUsername());
+            throw new UserAlreadyExistsException();
+        } catch (UsernameNotFoundException e) {
+            ownerDAO.create(newUser.getUsername(),newUser.getPassword());
+        }
+    }
 
 	@RequestMapping(path = "/api/players/{playerId}", method = RequestMethod.GET)
 	public Player getPlayerById(@PathVariable int playerId) {
@@ -44,7 +95,7 @@ public class AuctionController {
 
 
 	@RequestMapping(path = "/api/team/{ownerId}", method = RequestMethod.GET)
-	public List<Player> getTeam(@PathVariable int ownerId) {
+	public List<Player> getTeam(@PathVariable String ownerId) {
 		List<Player> onTeam = playerDAO.getAllPlayersOnTeam(ownerId);
 		return onTeam;
 	}
@@ -52,7 +103,19 @@ public class AuctionController {
 	//@CrossOrigin(origins = "http://localhost:8081")
 	@RequestMapping(path = "/api/bid", method = RequestMethod.POST)
 	public Bid addBid(@RequestBody Bid bid) {
+		//get latest bid for this player, make sure this bid is better.
+		Bid bestBid = bidDAO.getHighestBid(bid.getPlayerId());
+		if (bestBid.getContractVal() >= bid.getContractVal()) {
+			throw new IllegalBidException();
+		}
 		System.out.println(bid.getExpires());
+		System.out.println(bid.getBidder());
+		return bidDAO.addBid(bid);
+	}
+	
+	//@CrossOrigin(origins = "http://localhost:8081")
+	@RequestMapping(path = "/api/nominate", method = RequestMethod.POST)
+	public Bid addFirstBid(@RequestBody Bid bid) {
 		return bidDAO.addBid(bid);
 	}
 	
@@ -142,9 +205,47 @@ public class AuctionController {
 		return o;
 	}
 	
+	@RequestMapping(path = "api/owner/name/{ownerName}", method = RequestMethod.GET)
+	public Owner getOwnerByName(@PathVariable String ownerName) {
+		Owner o = new Owner();
+		o = ownerDAO.getOwnerInfoByName(ownerName);
+		return o;
+	}
+	
 	@RequestMapping(path = "api/owner/scoreboard", method = RequestMethod.GET)
 	public List<Owner> getOwnersForTable(){
 		return ownerDAO.getAllOwners();
 	}
 	
+    /**
+     * Object to return as body in JWT Authentication.
+     */
+    static class LoginResponse {
+
+        private String token;
+        private Owner user;
+
+        LoginResponse(String token, Owner user) {
+            this.token = token;
+            this.user = user;
+        }
+
+        @JsonProperty("token")
+        String getToken() {
+            return token;
+        }
+
+        void setToken(String token) {
+            this.token = token;
+        }
+
+        @JsonProperty("user")
+		public Owner getUser() {
+			return user;
+		}
+
+		public void setUser(Owner user) {
+			this.user = user;
+		}
+    }
 }

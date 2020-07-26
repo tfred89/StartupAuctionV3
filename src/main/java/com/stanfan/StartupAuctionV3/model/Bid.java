@@ -6,17 +6,21 @@ public class Bid {
 	private int bidLength;
 	private int bidSalary;
 	private int playerId;
-	private int bidderId;
+	private String bidder;
 	private String expires;
 	
-	public Bid(int bidderId, int playerId, int bidLength, int bidSalary) {
-		this.bidderId = bidderId;
+	public Bid(String bidder, int playerId, int bidLength, int bidSalary) {
+		this.bidder = bidder;
 		this.playerId = playerId;
 		this.bidLength = bidLength;
 		this.bidSalary = bidSalary;
 	}
 	public Bid() {
 		
+	}
+	
+	public int getContractVal() {
+		return (bidLength * 5) + bidSalary;
 	}
 	
 
@@ -58,12 +62,12 @@ public class Bid {
 		this.playerId = playerId;
 	}
 
-	public int getBidderId() {
-		return bidderId;
+	public String getBidder() {
+		return bidder;
 	}
 
-	public void setBidderId(int bidderId) {
-		this.bidderId = bidderId;
+	public void setBidder(String bidder) {
+		this.bidder = bidder;
 	}
 
 	

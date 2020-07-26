@@ -40,7 +40,7 @@ public class JDBCLotDAO implements LotDAO {
 	@Override
 	public Bid getBidByLotId(int lotId) {
 		Bid bid = new Bid();
-		String sqlBidJoin = "SELECT lot.bidid, playerid, ownerid, bidlength, bidsalary, expires FROM " +
+		String sqlBidJoin = "SELECT lot.bidid, playerid, ownername, bidlength, bidsalary, expires FROM " +
 							"bidledger JOIN Lot ON lot.bidId = bidledger.bidid " +
 							"WHERE lotId = ?";
 		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlBidJoin, lotId);
@@ -54,7 +54,7 @@ public class JDBCLotDAO implements LotDAO {
 		Bid b = new Bid();
 		b.setBidId(rs.getInt("bidid"));
 		b.setPlayerId(rs.getInt("playerid"));
-		b.setBidderId(rs.getInt("ownerid"));
+		b.setBidder(rs.getString("ownername"));
 		b.setBidLength(rs.getInt("bidlength"));
 		b.setBidSalary(rs.getInt("bidSalary"));
 		b.setExpires(rs.getString("expires"));

@@ -7,4 +7,5 @@ public interface BidDAO {
 	
 	public Bid addBid(Bid legalBid);
 	public Bid getBidById(int bidId);
+	public Bid getHighestBid(int playerId);
 }

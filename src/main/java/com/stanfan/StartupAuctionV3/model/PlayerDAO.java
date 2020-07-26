@@ -10,7 +10,7 @@ public interface PlayerDAO {
 	public Player insertPlayer(Player insertMe);
 	
 	public boolean playerAlreadyListed(int id);
-	public List<Player> getAllPlayersOnTeam(int ownerId);
+	public List<Player> getAllPlayersOnTeam(String ownerId);
 	public void addOwnerToPlayer(int playerId, int ownerId);
 	public List<Player> getAvailablePlayersAtPosition(String position);
 	public List<Player> getAllPlayers();

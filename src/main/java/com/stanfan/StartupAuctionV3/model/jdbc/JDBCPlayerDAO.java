@@ -64,12 +64,12 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		return count > 0;
 	}
 	@Override
-	public List<Player> getAllPlayersOnTeam(int ownerId){
+	public List<Player> getAllPlayersOnTeam(String ownerName){
 		List<Player> playersOnTeam = new ArrayList<Player>();
-		String sqlPlayersOnTeam = "SELECT playerId, espnId, ownerId, firstname, lastname, position, salary, length, contractvalue " +
+		String sqlPlayersOnTeam = "SELECT playerId, espnId, ownerId, firstname, lastname, position, salary, length, contractvalue, ownername " +
 								  "FROM player " +
-								  "WHERE ownerId = ?";
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlPlayersOnTeam);
+								  "WHERE ownername = ?";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sqlPlayersOnTeam, ownerName);
 		while(results.next()) {
 			Player player = mapRowToPlayer(results);
 			playersOnTeam.add(player);
@@ -87,9 +87,9 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		int newLength = bid.getBidLength();
 		int contractValue = (newLength * 5) + newSalary;
 		int playerId = bid.getPlayerId();
-		int ownerId = bid.getBidderId();
-		String sqlPlayerUpdate = "UPDATE player SET ownerId = ?, salary = ?, length = ?, contractvalue = ? WHERE playerid = ?";
-		jdbcTemplate.update(sqlPlayerUpdate, ownerId, newSalary, newLength, contractValue, playerId);
+		String ownername = bid.getBidder();
+		String sqlPlayerUpdate = "UPDATE player SET ownername = ?, salary = ?, length = ?, contractvalue = ? WHERE playerid = ?";
+		jdbcTemplate.update(sqlPlayerUpdate, ownername, newSalary, newLength, contractValue, playerId);
 	}
 	@Override
 	public List<Player> getAvailablePlayersAtPosition(String position){
@@ -120,6 +120,7 @@ public class JDBCPlayerDAO implements PlayerDAO {
 		p.setSalary(rs.getInt("salary"));
 		p.setLength(rs.getInt("length"));
 		p.setContractValue(rs.getInt("contractvalue"));
+		p.setOwnerName(rs.getString("ownername"));
 		return p;
 		
 	}

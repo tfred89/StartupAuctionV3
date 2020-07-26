@@ -11,7 +11,7 @@ public class Player {
 	private String lastName;
 	private int salary;
 	private int length;
-	private int highestBidderId;
+	private String ownerName;
 	private String position;
 	private int ownerId;
 	private int espnId;
@@ -67,12 +67,12 @@ public class Player {
 		this.length = length;
 	}
 
-	public int getHighestBidderId() {
-		return highestBidderId;
+	public String getOwnerName() {
+		return ownerName;
 	}
 
-	public void setHighestBidderId(int highestBidderId) {
-		this.highestBidderId = highestBidderId;
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 
 	public String getPosition() {
@@ -115,60 +115,25 @@ public class Player {
 		this.contractValue = contractValue;
 	}
 	
-	public Player bid(Player bidPlayer, Bid thisBid, BidDAO bidDAO) {
-		int bidValue = thisBid.getBidSalary() + (thisBid.getBidLength() * 5);
-		if (thisBid.getBidSalary() < 1 || thisBid.getBidLength() < 1) {
-			return bidPlayer;
-		}
-		if (bidValue > bidPlayer.getContractValue()) {
-			bidPlayer.setHighestBidderId(thisBid.getBidderId());
-			bidPlayer.setSalary(thisBid.getBidSalary());
-			bidPlayer.setLength(thisBid.getBidLength());
-			bidPlayer.setContractValue(bidValue);
-			//need to pass in jdbc template to update the database
-			bidDAO.addBid(thisBid);
-			return bidPlayer;
-			
-		}
-		return bidPlayer;
-	}
-
-	public List<Player> makePlayerInventory(EspnPlayer[] espnPlayers, PlayerDAO playerDAO) {
-		List<Player> ourPlayers = new ArrayList<Player>();
-		for (EspnPlayer player : espnPlayers) {
-			if (player.getDefaultPositionId() < 5) {
-				String firstName = player.getFirstName();
-				String lastName = player.getLastName();
-				int espnId = player.getId();
-				String position = posToString(player.getDefaultPositionId());
-				Player thisPlayer = new Player(espnId, firstName, lastName, position);
-				if(!playerDAO.playerAlreadyListed(thisPlayer.getEspnId())) {
-					thisPlayer = playerDAO.insertPlayer(thisPlayer);
-					System.out.println("made a player..." + thisPlayer.getFirstName() + " " + thisPlayer.getLastName() + " " + thisPlayer.getPosition());
-				}
-				ourPlayers.add(thisPlayer);
-				
-			}
-		}
-		return ourPlayers;
-	}
 	
-	public String posToString(int posId) {
-		if (posId == 1) {
-			return "QB";
-		}
-		if (posId == 2) {
-			return "RB";
-		}
-		if (posId == 3) {
-			return "WR";
-		}
-		if (posId == 4) {
-			return "TE";
-		} else {
-			return "NA";
-		}
+	//this is checked in the controller now.
+//	public Player bid(Player bidPlayer, Bid thisBid, BidDAO bidDAO) {
+//		int bidValue = thisBid.getBidSalary() + (thisBid.getBidLength() * 5);
+//		if (thisBid.getBidSalary() < 1 || thisBid.getBidLength() < 1) {
+//			return bidPlayer;
+//		}
+//		if (bidValue > bidPlayer.getContractValue()) {
+//			bidPlayer.se(thisBid.getBidder());
+//			bidPlayer.setSalary(thisBid.getBidSalary());
+//			bidPlayer.setLength(thisBid.getBidLength());
+//			bidPlayer.setContractValue(bidValue);
+//			//need to pass in jdbc template to update the database
+//			bidDAO.addBid(thisBid);
+//			return bidPlayer;
+//			
+//		}
+//		return bidPlayer;
+//	}
 
-	}
 	
 }

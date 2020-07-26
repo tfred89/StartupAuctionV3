@@ -32,7 +32,7 @@
         </div>
         <div id="posSelector" v-show="nomMode">
             <span>Choose a position</span><b-form-select v-model="selectedPos" class="mb-3" @change="lookupPos">
-                <b-form-select-option :value="null">Please select a Position</b-form-select-option>
+                <b-form-select-option :value="null">Please select a position</b-form-select-option>
                 <b-form-select-option value="QB">QB</b-form-select-option>
                 <b-form-select-option value="RB">RB</b-form-select-option>
                 <b-form-select-option value="WR">WR</b-form-select-option>
@@ -108,7 +108,7 @@ export default {
             })
         .then(() => {
             if(this.currentBid.bidId){
-                fetch('http://localhost:8080/api/owner/' + this.currentBid.bidderId, {
+                fetch('http://localhost:8080/api/owner/name/' + this.currentBid.bidder, {
                     method: 'GET'
                 })
                 .then((response) => {
@@ -148,6 +148,9 @@ export default {
     }
   },
   computed: {
+        currentUser: function() {
+            return this.$store.state.auth.user;
+        },
         nomFormIsValid: function(){
             return this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && this.selectedPlayerId > 0 && this.nomMode;
         },
@@ -160,14 +163,15 @@ export default {
         getTimeStamp: function() {
             let today = new Date();
             let date = today.getFullYear()+','+(today.getMonth())+','+(today.getDate());
-            let time = today.getHours() + "," + (today.getMinutes() + 1) + "," + today.getSeconds();
+            let time = (today.getHours() + 8) + "," + (today.getMinutes()) + "," + today.getSeconds();
             let dateTime = date + ','+ time + ',10';
             
             return dateTime;
             //const end = new Date(2020, 6, 17, 18, 10, 10, 10)
         },
         bidIsLegal: function(){
-            return (this.salaryInput + (this.lengthInput * 5)) > (this.currentBid.bidSalary + (this.currentBid.bidLength *5));
+            return (this.salaryInput + (this.lengthInput * 5)) > (this.currentBid.bidSalary + (this.currentBid.bidLength *5)) &&
+             this.currentUser.user.capRoom >= this.salaryInput && this.currentUser.user.yearsLeft >= this.lengthInput;
         }
   },
 
@@ -225,13 +229,13 @@ export default {
                     "Content-Type": "application/json"
                     },
                body: JSON.stringify({ playerId:  this.selectedPlayerId,
-                                      bidderId: -1,
+                                      bidder: this.currentUser.user.ownerName,
                                       bidLength: this.lengthInput,
                                       bidSalary:  this.salaryInput,
                                       expires: this.getTimeStamp
                                     })
                 };
-            fetch('http://localhost:8080/api/bid', requestOptions)
+            fetch('http://localhost:8080/api/nominate', requestOptions)
                     .then((response) => {
                         return response.json();
                     })
@@ -262,7 +266,10 @@ export default {
                                       espnId: this.selectedPlayer.espnId
                                     })
                 };
-            fetch('http://localhost:8080/api/nominate', updateRequestOptions);
+            fetch('http://localhost:8080/api/nominate', updateRequestOptions)
+                // .then(() => {
+                //     this.$router.go();
+                // })
         },
         lotCleanup: function(){
             const lotRequestOptions = {
@@ -286,7 +293,7 @@ export default {
                     "Content-Type": "application/json"
                     },
                body: JSON.stringify({ playerId:  this.selectedPlayer.playerId,
-                                      bidderId: -1,
+                                      bidder: this.currentUser.user.ownerName,
                                       bidLength: this.lengthInput,
                                       bidSalary:  this.salaryInput,
                                       expires: this.getTimeStamp
@@ -307,6 +314,9 @@ export default {
                     });
             
            this.engageBidMode();
+           //this.$forceUpdate();
+
+        //    this.$router.go()
         },
         winPlayer: function() {
             const requestOptions = {
@@ -314,11 +324,11 @@ export default {
                headers: {
                     "Content-Type": "application/json"
                     },
-                body: JSON.stringify({bidId:  this.currentBid.bidId,
+                body: JSON.stringify({bidId: this.currentBid.bidId,
                                       playerId: this.currentBid.playerId,
-                                      bidderId: this.currentBid.bidderId,
+                                      bidder: this.currentBid.bidder,
                                       bidLength: this.currentBid.bidLength,
-                                      bidSalary:  this.currentBid.bidSalary,
+                                      bidSalary: this.currentBid.bidSalary,
                                       expires: this.getTimeStamp
                                     })
                 };
@@ -329,7 +339,7 @@ export default {
                     "Content-Type": "application/json"
                     },
                 body: JSON.stringify({bidId:  this.currentBid.bidId,
-                                      bidderId: this.currentBid.bidderId,
+                                      bidder: this.currentBid.bidder,
                                       playerId: this.currentBid.playerId,
                                       bidLength: this.currentBid.bidLength,
                                       bidSalary:  this.currentBid.bidSalary,

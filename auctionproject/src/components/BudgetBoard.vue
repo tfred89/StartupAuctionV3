@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-table striped hover :items="ownerList" :fields="fields">
+      <b-table striped hover :items="ownerList" :fields="rows">
       </b-table>
   </div>
 </template>
@@ -11,7 +11,7 @@ export default {
     data() {
         return{
             ownerList: [],
-            fields: [
+            rows: [
                 {
                     key: 'ownerName',
                     label: "Owner",

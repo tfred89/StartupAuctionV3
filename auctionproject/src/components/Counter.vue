@@ -102,7 +102,7 @@ export default {
     width: 60%;
 }
 .big-num{
-    font-size: 32px;
+    font-size: 18px;
     font-weight: bold;
 }
 .hours{
