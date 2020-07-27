@@ -1,7 +1,6 @@
 <template>
-    <div id="auction" style="{ background-image: `url(${backgroundUrl})` }">
-        
-        
+  <div id="home">
+    <div id="auction">
         <div id="identifier"> <p v-if="loggedIn" > You are logged in as: {{ currentUser.user.ownerName }} </p></div>
         <BudgetBoard @newWinner="checkScore" :showScore="wins" id="budget-board"></BudgetBoard>
         <PlayerDropdown lotId="1" class="lotStyle" id="lot1" v-bind:ownerList="this.owners"></PlayerDropdown>
@@ -16,14 +15,15 @@
         <PlayerDropdown lotId="10" class="lotStyle" id="lot10" v-bind:ownerList="this.owners"></PlayerDropdown>
         <PlayerDropdown lotId="11" class="lotStyle" id="lot11" v-bind:ownerList="this.owners"></PlayerDropdown>
         <PlayerDropdown lotId="12" class="lotStyle" id="lot12" v-bind:ownerList="this.owners"></PlayerDropdown>
-
     </div>
+  </div>
 </template>
 
 <script>
 import PlayerDropdown from './PlayerDropdown.vue';
 import BudgetBoard from './BudgetBoard.vue';
-import backgroundUrl from '../assets/free-horizontal-rounded-stripes-texture-4.png';
+import backgroundUrl from '../assets/20950.jpg';
+
 
 import 'es6-promise/auto';
 import User from '../models/user';
@@ -42,14 +42,21 @@ export default {
         backgroundUrl,
         user: new User('', ''),
         wins: 0,
-        owners: []
+        owners: [],
+        content: ''
       }
     },
     mounted: {
       assertLogin: function() { 
+        if(localStorage.user){
+            this.user = localStorage.user;
+            }
         if (!this.currentUser){
         this.$router.push('/login');
+
         }
+        
+        
       },
         // showScore: function() {
         //    fetch('http://localhost:8080/api/owner/scoreboard/', {
@@ -129,7 +136,15 @@ export default {
   }
   #budget-board{
     grid-area: bb;
+    padding: 5px;
     position: sticky;
+    border-radius: 9px;
+    margin-left: 20px;
+    outline: 1px dashed rgb(93, 107, 93);
+    outline-offset: -5px;
+    background: rgba(211,211,211,0.8);
+    margin-top: 20px;
+    box-shadow: 5px 5px 5px rgb(101, 102, 102);
   }
 #identifier{
   grid-area: my-id;
@@ -140,9 +155,15 @@ export default {
     outline: 1px dashed rgb(93, 107, 93);
   
     outline-offset: -5px;
-    background: lightgrey;
+    background: rgba(211,211,211,0.8);
     margin-top: 20px;
     box-shadow: 5px 5px 5px rgb(101, 102, 102);
+}
+#home{
+  background-image: url("../assets/20950.jpg");
+   background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 2200px;
 }
 @media only screen and (max-width: 1080px){
     #auction {
@@ -177,10 +198,10 @@ export default {
       " bb my-id . . ."
       " bb lot1 lot1 lot2 lot2"
       " bb lot3 lot3 lot4 lot4"
-      " bb lot5 lot5 lot6 lot6"
-      " bb lot7 lot7 lot8 lot8"
-      " bb lot9 lot9 lot10 lot10"
-      " bb lot11 lot11 lot12 lot12";
+      " . lot5 lot5 lot6 lot6"
+      " . lot7 lot7 lot8 lot8"
+      " . lot9 lot9 lot10 lot10"
+      " . lot11 lot11 lot12 lot12";
     grid-gap: 35px;
   }
 } 

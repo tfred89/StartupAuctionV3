@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -87,6 +88,14 @@ public class AuctionController {
         }
     }
 
+	@PreAuthorize("isAuthenticated()")
+	@RequestMapping(value = "api/test/user", method = RequestMethod.GET)
+	public String userAccess() {
+		return "User Content.";
+	}
+	
+	
+	
 	@RequestMapping(path = "/api/players/{playerId}", method = RequestMethod.GET)
 	public Player getPlayerById(@PathVariable int playerId) {
 		Player player = playerDAO.getPlayerById(playerId);

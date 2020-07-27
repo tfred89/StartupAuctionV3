@@ -1,17 +1,20 @@
 <template>
   <div>
-    <div>
-        <label for="ownerSelector"> Select another team: </label>
-        <select id="ownerSelector" v-model="selectedOwnerName" @change="showARoster">
-            <option v-for="owner in ownerList" :key="owner.ownerId"> {{ owner.ownerName }} </option>
-        </select>
-    </div>
-    <div id="table"> 
-
-      <b-table striped hover :items="playerList" :fields="rows">
-      </b-table>
-
-    </div>
+    <b-container fluid class="table-page">
+        <div>
+          <b-container fluid class="team-select-row">
+            <span> Select another team: &nbsp; &nbsp; </span>
+            <b-form-select class="col-sm-4" id="ownerSelector" v-model="selectedOwnerName" @change="showARoster">
+                <b-form-select-option v-for="owner in ownerList" :key="owner.ownerId" :value="owner.ownerName"> 
+                    {{ owner.ownerName }} </b-form-select-option>
+            </b-form-select>
+          </b-container>
+        </div>
+            <div id="table"> 
+            <b-table striped hover :items="playerList" :fields="rows">
+            </b-table>
+        </div>
+    </b-container>
   </div>
 </template>
 
@@ -102,8 +105,14 @@ export default {
 
 <style>
 
+.team-select-row{
+    width: 100%;
+    margin: 25px;
+}
 
-
+.table-page{
+    width: 85%;
+}
 
 
 

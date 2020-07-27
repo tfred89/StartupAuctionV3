@@ -1,6 +1,5 @@
 <template>
   <div class="col-md-12">
-      <Menu> </Menu>
     <div class="card card-container">
       <img
         id="profile-img"
@@ -54,12 +53,10 @@
 
 <script>
 import User from '../models/user';
-import Menu from './Menu.vue';
+
 export default {
   name: 'Login',
-  components: {
-      'Menu': Menu
-  },
+
   data() {
     return {
       user: new User('', ''),

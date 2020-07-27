@@ -152,10 +152,12 @@ export default {
             return this.$store.state.auth.user;
         },
         nomFormIsValid: function(){
-            return this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && this.selectedPlayerId > 0 && this.nomMode;
+            return this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && this.selectedPlayerId > 0 && this.nomMode &&
+            this.salaryInput <= this.currentUser.user.capRoom && this.lengthInput <= this.currentUser.user.yearsLeft;
         },
         bidFormIsValid: function(){
-            return this.bidMode && this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && this.selectedPlayer.playerId > 0 && this.bidMode && this.bidIsLegal;
+            return this.bidMode && this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && 
+            this.selectedPlayer.playerId > 0 && this.bidMode && this.bidIsLegal;
         },
         lotIdNum: function(){
             return parseInt(this.lotId);
@@ -171,7 +173,8 @@ export default {
         },
         bidIsLegal: function(){
             return (this.salaryInput + (this.lengthInput * 5)) > (this.currentBid.bidSalary + (this.currentBid.bidLength *5)) &&
-             this.currentUser.user.capRoom >= this.salaryInput && this.currentUser.user.yearsLeft >= this.lengthInput;
+             this.currentUser.user.capRoom >= this.salaryInput && this.currentUser.user.yearsLeft >= this.lengthInput && 
+             this.salaryInput <= this.currentUser.user.capRoom && this.lengthInput <= this.currentUser.user.yearsLeft;
         }
   },
 
