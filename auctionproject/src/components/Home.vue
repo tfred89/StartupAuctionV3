@@ -130,9 +130,11 @@ export default {
   }
   #lot11{ 
     grid-area: lot11;
+    margin-bottom: 35px;
   }
   #lot12{ 
     grid-area: lot12;
+    margin-bottom: 35px;
   }
   #budget-board{
     grid-area: bb;
@@ -165,7 +167,7 @@ export default {
   background-attachment: fixed;
   background-size: 2200px;
 }
-@media only screen and (max-width: 1080px){
+@media only screen and (max-width: 920px){
     #auction {
     margin-right: 20px;
     display: grid;
@@ -188,10 +190,10 @@ export default {
     grid-gap: 35px;
   }
 }
- @media only screen and (min-width: 1080px){
+ @media only screen and (min-width: 920px){
   #auction {
     margin-right: 35px;
-    margin-bottom: 35px;
+
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 

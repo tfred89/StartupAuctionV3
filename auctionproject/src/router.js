@@ -4,10 +4,10 @@ import Login from './components/Login.vue';
 import Register from './components/Register.vue';
 import Home from './components/Home.vue';
 import Rosters from './components/Rosters.vue';
-import VueCookies from 'vue-cookies';
+
 
 Vue.use(Router);
-Vue.use(VueCookies);
+
 export const router = new Router({
   mode: 'history',
   routes: [

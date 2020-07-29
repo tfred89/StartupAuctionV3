@@ -1,4 +1,7 @@
 import axios from 'axios';
+import Vue from 'vue'
+import VueCookies from 'vue-cookies'
+Vue.use(VueCookies)
 
 const API_URL = 'http://localhost:8080/api/';
 
@@ -10,6 +13,7 @@ class AuthService {
         password: user.password
       })
       .then(response => {
+        Vue.$cookies.set('token', response.data.token);
         if (response.data.accessToken) {
           localStorage.setItem('user', JSON.stringify(response.data));
         }

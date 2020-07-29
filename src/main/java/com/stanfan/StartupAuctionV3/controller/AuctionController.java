@@ -1,5 +1,6 @@
 package com.stanfan.StartupAuctionV3.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -94,8 +95,7 @@ public class AuctionController {
 		return "User Content.";
 	}
 	
-	
-	
+
 	@RequestMapping(path = "/api/players/{playerId}", method = RequestMethod.GET)
 	public Player getPlayerById(@PathVariable int playerId) {
 		Player player = playerDAO.getPlayerById(playerId);
@@ -110,6 +110,7 @@ public class AuctionController {
 	}
 	//add bid to bid list
 	//@CrossOrigin(origins = "http://localhost:8081")
+	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(path = "/api/bid", method = RequestMethod.POST)
 	public Bid addBid(@RequestBody Bid bid) {
 		//get latest bid for this player, make sure this bid is better.
@@ -123,6 +124,7 @@ public class AuctionController {
 	}
 	
 	//@CrossOrigin(origins = "http://localhost:8081")
+	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(path = "/api/nominate", method = RequestMethod.POST)
 	public Bid addFirstBid(@RequestBody Bid bid) {
 		return bidDAO.addBid(bid);
@@ -140,6 +142,7 @@ public class AuctionController {
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(path = "/api/nominate", method = RequestMethod.PUT)
 	public void tempOwnerForNomination(@RequestBody Player player) {
 		playerDAO.addOwnerToPlayer(player.getPlayerId(), player.getOwnerId());
@@ -211,6 +214,15 @@ public class AuctionController {
 	public Owner getOwnerById(@PathVariable int ownerId){
 		Owner o = new Owner();
 		o = ownerDAO.getOwnerInfoById(ownerId);
+		return o;
+	}
+
+	@RequestMapping(path = "api/owner/persist", method = RequestMethod.GET)
+	public Owner persistedLogin(Principal principal) {
+		Owner o = new Owner();
+		System.out.println(principal);
+		System.out.println(principal.getName());
+		o = ownerDAO.getOwnerInfoByName(principal.getName());
 		return o;
 	}
 	

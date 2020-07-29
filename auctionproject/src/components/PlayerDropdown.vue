@@ -94,32 +94,51 @@ export default {
     props: ['lotId', 'ownerList']
     ,
     mounted:  function() {
-        fetch('http://localhost:8080/api/lot/' + this.lotIdNum, {
-            method: 'GET'
-        })
-        .then((response) => {
+        console.log(this.$cookies.get('token'));
+        let t = JSON.parse(JSON.stringify(this.$cookies.get('token')));
+        let h = new Headers();
+        h.append('Authentication', 'Bearer' + t);
+        fetch('http://localhost:8080/api/owner/persist', {
+               method: 'GET',
+               headers: h
+            })
+            .then((response) => {
                 return response.json();
             })
-        .then((data) => {
-                console.log(data);
-                this.bid = data;
-                this.currentBid = this.bid;
-                this.dressLot();
+            .then((data) => {
+                this.jwtUser = data;
             })
-        .then(() => {
-            if(this.currentBid.bidId){
-                fetch('http://localhost:8080/api/owner/name/' + this.currentBid.bidder, {
-                    method: 'GET'
-                })
-                .then((response) => {
+            
+            .then(() => {
+
+            fetch('http://localhost:8080/api/lot/' + this.lotIdNum, {
+                method: 'GET'
+            })
+            .then((response) => {
                     return response.json();
                 })
-                .then((data) => {
-                    this.owner = data;
-                    this.currentOwner = this.owner;
+            .then((data) => {
+                    console.log(data);
+                    this.bid = data;
+                    this.currentBid = this.bid;
+                    this.dressLot();
                 })
-            }
+            .then(() => {
+                if(this.currentBid.bidId){
+                    fetch('http://localhost:8080/api/owner/name/' + this.currentBid.bidder, {
+                        method: 'GET'
+                    })
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((data) => {
+                        this.owner = data;
+                        this.currentOwner = this.owner;
+                    })
+                }
         })
+        })
+        
     },
   data () {
     return {
@@ -141,15 +160,23 @@ export default {
       bidSecond: 0,
       bidMillisecond: 0,
       loaded: 0,
-      localOwnerList: []
-      
+      localOwnerList: [],
+      jwtUser: Object
       
 
     }
   },
   computed: {
         currentUser: function() {
+            var current_time = new Date().now() / 1000;
+            if (this.$store.state.auth.user){
             return this.$store.state.auth.user;
+            }
+            else if(this.$cookies.get('token') && this.$cookies.get('token').exp > current_time){
+                return this.jwtUser;
+            } else {
+                return null;
+            }
         },
         nomFormIsValid: function(){
             return this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && this.selectedPlayerId > 0 && this.nomMode &&
@@ -229,7 +256,8 @@ export default {
            const requestOptions = {
                method: "POST",
                headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authentication" : `Bearer ${this.$cookies.get('token')}`
                     },
                body: JSON.stringify({ playerId:  this.selectedPlayerId,
                                       bidder: this.currentUser.user.ownerName,
@@ -386,7 +414,7 @@ export default {
 <style scoped>
 
 .btn{
-    margin: 5px 20px 0px;
+    margin: 5px 5px 0px;
 }
 .current-bid-row{
     font-family: "Franklin Gothic Medium", "Franklin Gothic", "ITC Franklin Gothic", Arial, sans-serif; 
