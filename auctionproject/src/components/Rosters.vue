@@ -29,6 +29,7 @@ export default {
             ownerList: [],
             playerList: [],
             selectedOwnerName: '',
+            url: 'http://localhost:8080/',
             rows: [
                 {
                     key: 'firstName',
@@ -68,21 +69,21 @@ export default {
     },
     methods: {
         showMyRoster(){
-            fetch('http://localhost:8080/api/team/' + this.currentUser.user.ownerName, {
+            fetch(this.url + 'api/team/' + this.currentUser.user.ownerName, {
                 method: 'GET'
             })
             .then(response => response.json())
             .then(data => (this.playerList = data));
         },
         showARoster(){
-            fetch('http://localhost:8080/api/team/' + this.selectedOwnerName, {
+            fetch(this.url + 'api/team/' + this.selectedOwnerName, {
                 method: 'GET'
             })
             .then(response => response.json())
             .then(data => (this.playerList = data));
         },
         getOwnerList: function() {
-           fetch('http://localhost:8080/api/owner/scoreboard/', {
+           fetch(this.url + 'api/owner/scoreboard/', {
                method: 'GET'
            })
             .then(response => response.json())
@@ -95,11 +96,18 @@ export default {
     },
     computed: {
         currentUser: function() {
-            return this.$store.state.auth.user;
+            if (this.$store.state.jwtUser.user){
+                return this.$store.state.jwtUser.user;
+            }
+            if (this.$store.state.auth.user){
+                return this.$store.state.auth.user;
+            } else {
+                return null;
+            }
         }
     }
-
 }
+
 
 </script>
 

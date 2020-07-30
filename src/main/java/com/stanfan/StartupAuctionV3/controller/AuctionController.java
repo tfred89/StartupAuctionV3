@@ -88,20 +88,18 @@ public class AuctionController {
             ownerDAO.create(newUser.getUsername(),newUser.getPassword());
         }
     }
-
+	//not actually sure what this is for.
 	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(value = "api/test/user", method = RequestMethod.GET)
 	public String userAccess() {
 		return "User Content.";
 	}
 	
-
 	@RequestMapping(path = "/api/players/{playerId}", method = RequestMethod.GET)
 	public Player getPlayerById(@PathVariable int playerId) {
 		Player player = playerDAO.getPlayerById(playerId);
 		return player;
 	}
-
 
 	@RequestMapping(path = "/api/team/{ownerId}", method = RequestMethod.GET)
 	public List<Player> getTeam(@PathVariable String ownerId) {
@@ -109,7 +107,6 @@ public class AuctionController {
 		return onTeam;
 	}
 	//add bid to bid list
-	//@CrossOrigin(origins = "http://localhost:8081")
 	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(path = "/api/bid", method = RequestMethod.POST)
 	public Bid addBid(@RequestBody Bid bid) {
@@ -118,12 +115,9 @@ public class AuctionController {
 		if (bestBid.getContractVal() >= bid.getContractVal()) {
 			throw new IllegalBidException();
 		}
-		System.out.println(bid.getExpires());
-		System.out.println(bid.getBidder());
 		return bidDAO.addBid(bid);
 	}
 	
-	//@CrossOrigin(origins = "http://localhost:8081")
 	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(path = "/api/nominate", method = RequestMethod.POST)
 	public Bid addFirstBid(@RequestBody Bid bid) {
@@ -151,7 +145,6 @@ public class AuctionController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@RequestMapping(path = "/api/win/player", method = RequestMethod.PUT)
 	public void updatePlayerAfterWin(@RequestBody Bid bid) {
-		System.out.println("test! well.. we got this far...");
 		playerDAO.addInfoAfterWin(bid);
 	}
 	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
@@ -180,7 +173,6 @@ public class AuctionController {
 	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
 	@RequestMapping(value = "/api/players", method = RequestMethod.GET)
 	public List<Player> getAllPlayers(){
-		System.out.println("this worked.");
 		return playerDAO.getAllPlayers();
 	}
 
@@ -220,7 +212,6 @@ public class AuctionController {
 	@RequestMapping(path = "api/owner/persist", method = RequestMethod.GET)
 	public Owner persistedLogin(Principal principal) {
 		Owner o = new Owner();
-		System.out.println(principal.getName());
 		o = ownerDAO.getOwnerInfoByName(principal.getName());
 		return o;
 	}

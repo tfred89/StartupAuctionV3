@@ -10,6 +10,7 @@ export default {
 
     data() {
         return{
+            url: 'http://localhost:8080/',
             ownerList: [],
             rows: [
                 {
@@ -40,7 +41,7 @@ export default {
     },
     methods: {
         showScore: function() {
-           fetch('http://localhost:8080/api/owner/scoreboard/', {
+           fetch(this.url + 'api/owner/scoreboard/', {
                method: 'GET'
            })
             .then(response => response.json())

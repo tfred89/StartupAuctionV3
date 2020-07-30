@@ -53,18 +53,8 @@ export default {
             }
         if (!this.currentUser){
         this.$router.push('/login');
-
         }
-        
-        
-      },
-        // showScore: function() {
-        //    fetch('http://localhost:8080/api/owner/scoreboard/', {
-        //        method: 'GET'
-        //    })
-        //     .then(response => response.json())
-        //     .then(data => (this.owners = data));
-        // }
+      }
     },
     methods: {
     checkScore: function(){

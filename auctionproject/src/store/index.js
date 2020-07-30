@@ -9,7 +9,16 @@ export default new Vuex.Store({
   modules: {
     auth
   },
-  // state: {
-  //   token: this.$store.state.auth.user.token
-  // }
+  state: {
+    jwtUser: {
+      user: {}
+    }
+  },
+  mutations: {
+    SAVE_USER(state, payload) {
+      state.jwtUser.user = payload;
+    }
+  }
+
 });
+
