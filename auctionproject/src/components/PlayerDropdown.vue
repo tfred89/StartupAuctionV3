@@ -94,21 +94,25 @@ export default {
     props: ['lotId', 'ownerList']
     ,
     mounted:  function() {
-        console.log(this.$cookies.get('token'));
-        let t = JSON.parse(JSON.stringify(this.$cookies.get('token')));
-        let h = new Headers();
-        h.append('Authentication', 'Bearer' + t);
-        fetch('http://localhost:8080/api/owner/persist', {
+        const requestOptions = {
                method: 'GET',
-               headers: h
-            })
+               headers: {
+                    "Content-Type": "application/json",
+                    "Authorization" : `Bearer ${this.$cookies.get('token')}`
+                    }
+                };
+        fetch('http://localhost:8080/api/owner/persist', requestOptions)
             .then((response) => {
                 return response.json();
             })
             .then((data) => {
-                this.jwtUser = data;
+                this.jwtUser.user = data;
             })
-            
+            .then(() => {
+                if(!this.currentUser){
+                    this.$router.push("/login");
+                }
+            })
             .then(() => {
 
             fetch('http://localhost:8080/api/lot/' + this.lotIdNum, {
@@ -161,26 +165,29 @@ export default {
       bidMillisecond: 0,
       loaded: 0,
       localOwnerList: [],
-      jwtUser: Object
+      jwtUser: {
+          user: {}
+      }
       
 
     }
   },
   computed: {
         currentUser: function() {
-            var current_time = new Date().now() / 1000;
-            if (this.$store.state.auth.user){
-            return this.$store.state.auth.user;
-            }
-            else if(this.$cookies.get('token') && this.$cookies.get('token').exp > current_time){
+            if (this.jwtUser.user){
                 return this.jwtUser;
+            }
+            if (this.$store.state.auth.user){
+                return this.$store.state.auth.user;
             } else {
                 return null;
             }
         },
         nomFormIsValid: function(){
-            return this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && this.selectedPlayerId > 0 && this.nomMode &&
-            this.salaryInput <= this.currentUser.user.capRoom && this.lengthInput <= this.currentUser.user.yearsLeft;
+            return  this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && 
+                    this.selectedPlayerId > 0 && this.nomMode &&
+                    (this.salaryInput <= this.currentUser.user.capRoom || this.salaryInput <= this.currentUser.capRoom) &&
+                    (this.lengthInput <= this.currentUser.user.yearsLeft || this.lengthInput <= this.currentUser.yearsLeft);
         },
         bidFormIsValid: function(){
             return this.bidMode && this.lengthInput > 0 && this.salaryInput > 0 && this.salaryInput % 1 === 0 && 
@@ -257,7 +264,7 @@ export default {
                method: "POST",
                headers: {
                     "Content-Type": "application/json",
-                    "Authentication" : `Bearer ${this.$cookies.get('token')}`
+                    "Authorization" : `Bearer ${this.$cookies.get('token')}`
                     },
                body: JSON.stringify({ playerId:  this.selectedPlayerId,
                                       bidder: this.currentUser.user.ownerName,
@@ -284,7 +291,8 @@ export default {
             const updateRequestOptions = {
                method: "PUT",
                headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization" : `Bearer ${this.$cookies.get('token')}`
                     },
                body: JSON.stringify({ playerId:  this.selectedPlayerId,
                                       ownerId: -1,
@@ -298,9 +306,9 @@ export default {
                                     })
                 };
             fetch('http://localhost:8080/api/nominate', updateRequestOptions)
-                // .then(() => {
-                //     this.$router.go();
-                // })
+                .then(() => {
+                    this.$router.go();
+                })
         },
         lotCleanup: function(){
             const lotRequestOptions = {
@@ -321,7 +329,8 @@ export default {
            const requestOptions = {
                method: "POST",
                headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization" : `Bearer ${this.$cookies.get('token')}`
                     },
                body: JSON.stringify({ playerId:  this.selectedPlayer.playerId,
                                       bidder: this.currentUser.user.ownerName,
@@ -347,7 +356,7 @@ export default {
            this.engageBidMode();
            //this.$forceUpdate();
 
-        //    this.$router.go()
+            this.$router.go()
         },
         winPlayer: function() {
             const requestOptions = {

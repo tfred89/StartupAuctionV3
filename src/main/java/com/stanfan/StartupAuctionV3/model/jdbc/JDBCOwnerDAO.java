@@ -77,7 +77,7 @@ public class JDBCOwnerDAO implements OwnerDAO {
 		o.setCapRoom(rs.getInt("caproom"));
 		o.setYearsLeft(rs.getInt("yearsleft"));
 		o.setActivated(true);
-		o.setAuthorities("ROLE_USER");
+		o.setAuthorities("USER");
 		return o;
 	}
 	

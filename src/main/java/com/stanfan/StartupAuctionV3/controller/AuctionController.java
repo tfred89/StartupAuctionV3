@@ -216,11 +216,10 @@ public class AuctionController {
 		o = ownerDAO.getOwnerInfoById(ownerId);
 		return o;
 	}
-
+	@PreAuthorize("isAuthenticated()")
 	@RequestMapping(path = "api/owner/persist", method = RequestMethod.GET)
 	public Owner persistedLogin(Principal principal) {
 		Owner o = new Owner();
-		System.out.println(principal);
 		System.out.println(principal.getName());
 		o = ownerDAO.getOwnerInfoByName(principal.getName());
 		return o;
