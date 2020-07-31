@@ -137,6 +137,15 @@ export default {
               this.owner = data;
               this.currentOwner = this.owner;
             });
+          fetch(this.url + "api/pass/" + this.currentBid.playerId, {
+              method: "GET"
+          })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                this.passers = data;
+            })
         }
       });
   },
@@ -247,6 +256,13 @@ export default {
         this.salaryInput <= this.currentUser.user.capRoom &&
         this.lengthInput <= this.currentUser.user.yearsLeft
       );
+    }
+  },
+  watch: {
+    passers: function(){
+        if(this.passers.length >= 11 ) {
+            this.winPlayer();
+        }
     }
   },
   methods: {
