@@ -29,6 +29,7 @@ import com.stanfan.StartupAuctionV3.model.Lot;
 import com.stanfan.StartupAuctionV3.model.LotDAO;
 import com.stanfan.StartupAuctionV3.model.Owner;
 import com.stanfan.StartupAuctionV3.model.OwnerDAO;
+import com.stanfan.StartupAuctionV3.model.Pass;
 import com.stanfan.StartupAuctionV3.model.Player;
 import com.stanfan.StartupAuctionV3.model.PlayerDAO;
 import com.stanfan.StartupAuctionV3.model.RegisterUserDTO;
@@ -226,6 +227,16 @@ public class AuctionController {
 	@RequestMapping(path = "api/owner/scoreboard", method = RequestMethod.GET)
 	public List<Owner> getOwnersForTable(){
 		return ownerDAO.getAllOwners();
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	@RequestMapping(path = "api/pass/{playerId}", method = RequestMethod.POST)
+	public List<String> postNewPass(@PathVariable int playerId, Principal principal){
+		return ownerDAO.addPass(playerId, principal.getName());
+	}
+	@RequestMapping(path = "api/pass/{playerId}", method = RequestMethod.GET)
+	public List<String> getPasses(@PathVariable int playerId){
+		return ownerDAO.getPassesById(playerId);
 	}
 	
     /**

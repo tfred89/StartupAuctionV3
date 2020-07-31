@@ -16,8 +16,8 @@ public interface OwnerDAO {
 
     Owner findByUsername(String username);
 
-
-
+    public List<String> addPass(int playerId, String owner);
+    public List<String> getPassesById(int playerId);
     boolean create(String username, String password);
 }
 

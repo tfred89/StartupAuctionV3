@@ -80,6 +80,28 @@ public class JDBCOwnerDAO implements OwnerDAO {
 		o.setAuthorities("USER");
 		return o;
 	}
+	public List<String> addPass(int playerId, String owner){
+		List<String> owners = new ArrayList<String>();
+		String sql = "INSERT INTO passLedger (playerId, ownername) VALUES (?, ?)";
+		jdbcTemplate.update(sql, playerId, owner);
+		
+		String sqlList = "SELECT ownername FROM passledger WHERE playerId = ?";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlList, playerId);
+		
+		while(result.next()) {
+			owners.add(result.getString("ownername"));
+		}
+		return owners;
+	}
+	public List<String> getPassesById(int playerId){
+		List<String> owners = new ArrayList<String>();
+		String sqlList = "SELECT ownername FROM passledger WHERE playerId = ?";
+		SqlRowSet result = jdbcTemplate.queryForRowSet(sqlList, playerId);
+		while(result.next()) {
+			owners.add(result.getString("ownername"));
+		}
+		return owners;
+	}
 	
 	@Override
 	public List<Owner> findAll() {

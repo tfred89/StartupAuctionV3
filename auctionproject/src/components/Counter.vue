@@ -5,18 +5,18 @@
                 <b-row>
                     <b-col class="col-sm-1">
                     </b-col>
-                    <b-col class="hours relative col-sm-2">
+                    <b-col class="hours col-sm-2">
                         <div class="big-num">{{displayHours}}: </div>
                         <!-- <div class="clock-label">hours</div> -->
                     </b-col>
                     <!-- <span class="leading-snug big-num">:</span> -->
-                    <b-col class="minutes relative col-sm-2">
+                    <b-col class="minutes col-sm-2">
                        <div class="big-num"> {{displayMinutes}}: </div>
                         <!-- <div class="clock-label">min</div> -->
                     </b-col>
                     <!-- <span class="leading-snug big-num">:</span> -->
-                    <div class="seconds relative">
-                    <b-col class="col-sm-2"> 
+                    <div>
+                    <b-col class="seconds col-sm-2"> 
                         <div class="big-num"> {{displaySeconds}} </div>
                     </b-col>
                     <!-- <div class="clock-label">sec</div> -->
@@ -102,7 +102,7 @@ export default {
     width: 60%;
 }
 .big-num{
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
 }
 .hours{

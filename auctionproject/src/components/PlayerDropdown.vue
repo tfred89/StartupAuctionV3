@@ -14,10 +14,10 @@
                 </b-row>
                 <b-row>
                     <b-col>
-                        <div> SALARY: ${{ currentBid.bidSalary}} </div>
+                        <div> Salary: ${{ currentBid.bidSalary}} </div>
                     </b-col>
                     <b-col>
-                        <div> {{ currentBid.bidLength }} YEARS </div>
+                        <div> {{ currentBid.bidLength }} Years </div>
                     </b-col>
                     <b-col>
                         <div> {{ currentOwner.ownerName }} </div>
@@ -64,11 +64,12 @@
                 </b-form-select>    
             </b-row>
         </b-container>
+        
         <b-container>
             <b-row id="button-row">
                     <b-button variant="outline-primary" v-bind:disabled="!nomFormIsValid" @click="submitNomination">Nominate</b-button>
                     <b-button variant="danger" v-bind:disabled="!bidFormIsValid" @click="submitBid">Bid</b-button>
-                    <b-button v-bind:disabled="true">Pass</b-button>
+                    <b-button v-show="!userHasPassed" v-bind:disabled="!iCanPass" @click="passOnPlayer">Pass</b-button>
             </b-row>
         </b-container>
     </form>
@@ -76,6 +77,7 @@
          <Counter @timeExpired="winPlayer" :updateClock="loaded" :year="bidYear" :month="bidMonth" :date="bidDate" :hour="bidHour" 
          :minute="bidMinute" :second="bidSecond" :millisecond="bidMillisecond"></Counter>
     </div>
+    <b-form-checkbox v-show="!userHasPassed" v-model="passable" switch size="sm">Enable pass button</b-form-checkbox>
   </div>
 </template>
 
@@ -162,10 +164,27 @@ export default {
       localOwnerList: [],
       jwtUser: {
         user: {}
-      }
+      },
+      passable: false,
+      passers: []
     };
   },
   computed: {
+    passes: function() {
+        if(this.passers){
+            return this.passers.length;
+        }
+        return 0;
+    },
+    iCanPass: function(){
+        return this.passable && !this.userHasPassed;
+    },
+    userHasPassed: function(){
+        if(this.passers.includes(this.jwtUser.user.ownerName)){
+            return true;
+        }
+        return false;
+    },
     currentUser: function() {
       if (this.jwtUser.user) {
         return this.jwtUser;
@@ -231,6 +250,9 @@ export default {
     }
   },
   methods: {
+    enablePass: function(){
+        this.passable = true;
+    },
     callForTimer: function() {
       ++this.loaded;
     },
@@ -327,6 +349,22 @@ export default {
       ).then(() => {
         this.$router.go();
       });
+    },
+    passOnPlayer: function() {
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.$cookies.get("token")}`
+        }
+      }
+        fetch(this.url + "api/pass/" + this.currentBid.playerId, requestOptions)
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+              this.passers = data;
+          })
     },
     lotCleanup: function() {
       const lotRequestOptions = {
@@ -441,6 +479,7 @@ export default {
 </script>
 
 <style scoped>
+
 .btn {
   margin: 5px 5px 0px;
 }
