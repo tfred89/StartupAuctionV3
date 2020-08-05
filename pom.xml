@@ -11,7 +11,7 @@
 	<groupId>com.stanfan</groupId>
 	<artifactId>StartupActionV3</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 	<name>StartupActionV3</name>
 	<description>FFL Dynasty Auction System</description>
     <modules>
