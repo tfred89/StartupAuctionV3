@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.stanfan.StartupAuctionV3.security.jwt.JWTConfigurer;
 import com.stanfan.StartupAuctionV3.security.jwt.TokenProvider;
 
-
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -57,7 +57,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+        httpSecurity.requiresChannel()
+        .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+        .requiresSecure()
+
+                .and()
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
 
