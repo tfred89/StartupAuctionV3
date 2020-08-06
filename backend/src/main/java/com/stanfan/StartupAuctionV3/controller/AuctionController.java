@@ -2,7 +2,8 @@ package com.stanfan.StartupAuctionV3.controller;
 
 import java.security.Principal;
 import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,7 @@ public class AuctionController {
 	private OwnerDAO ownerDAO;
 	private BidDAO bidDAO;
 	private LotDAO lotDAO;
+	private static final Logger LOG = LoggerFactory.getLogger(AuctionController.class);
 	
 	public AuctionController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, 
 			PlayerDAO playerDAO, OwnerDAO ownerDAO, BidDAO bidDAO, LotDAO lotDAO) {
@@ -60,7 +62,18 @@ public class AuctionController {
 		this.ownerDAO = ownerDAO;
 		this.bidDAO = bidDAO;
 		this.lotDAO = lotDAO;
+
+		
 	}
+
+	    // Forwards all routes to FrontEnd except: '/', '/index.html', '/api', '/api/**'
+    // Required because of 'mode: history' usage in frontend routing, see README for further details
+    @RequestMapping(value = "{_:^(?!index\\.html|api).$}")
+    public String redirectApi() {
+        LOG.info("URL entered directly into the Browser, so we need to redirect...");
+        return "forward:/";
+	}
+	
 	@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*")
     @RequestMapping(value = "/api/login", method = RequestMethod.POST)
     public ResponseEntity<LoginResponse> login(@RequestBody LoginDTO loginDto) {
