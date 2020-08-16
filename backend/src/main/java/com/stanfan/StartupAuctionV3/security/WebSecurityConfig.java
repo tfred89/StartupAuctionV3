@@ -56,11 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.requiresChannel()
-        .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
-        .requiresSecure()
-
-                .and()
+        httpSecurity
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
 

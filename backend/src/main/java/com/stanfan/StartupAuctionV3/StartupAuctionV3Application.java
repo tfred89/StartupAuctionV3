@@ -1,10 +1,11 @@
 package com.stanfan.StartupAuctionV3;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 
 
-
+@ComponentScan(basePackages={"com.stanfan.StartupAuctionV3.controller"})
 @SpringBootApplication
 public class StartupAuctionV3Application {
 	
