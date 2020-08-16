@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.stanfan.StartupAuctionV3.security.jwt.JWTConfigurer;
 import com.stanfan.StartupAuctionV3.security.jwt.TokenProvider;
 
-
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
